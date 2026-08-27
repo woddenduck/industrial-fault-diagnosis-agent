@@ -1,11 +1,11 @@
 # Industrial Fault Diagnosis Agent
 
-面向工业设备故障诊断场景的大模型应用工程。项目以 Siemens SINAMICS G120C 为示例，组合 LangGraph、Tool Calling、Hybrid RAG、Reranker 和 FastAPI，实现设备状态查询、维修记录聚合、技术手册检索、风险分级与人工复核。
+面向工业设备故障诊断场景的大模型应用工程。项目以 Siemens SINAMICS G120C 为示例，组合 LangGraph、可审计工具节点、Hybrid RAG、Reranker 和 FastAPI，实现设备状态查询、维修记录聚合、技术手册检索、风险分级与人工复核。
 
 ## 核心能力
 
 - LangGraph 状态编排与条件路由
-- 设备状态、维修历史和诊断报告 Tool
+- 设备状态、维修历史和诊断报告工具节点
 - BM25 + Vector + RRF 混合检索
 - Reranker 失败自动降级
 - 证据不足拒答与引用来源返回
@@ -90,6 +90,12 @@ curl -sS -X POST http://127.0.0.1:8010/v1/diagnose \
 接口详情见 [API 说明](docs/api.md)，首次上传文档和构建知识库的方法也在其中说明。
 
 ## 测试
+
+完整离线测试（默认不会访问真实服务）：
+
+```bash
+python -m pytest
+```
 
 离线封装验收：
 

@@ -8,13 +8,8 @@
 2. 写死服务地址；
 3. 在多个文件中分别定义同一配置。
 
-该版本同时兼容：
-
-1. Day 12 使用的 VLLM_BASE_URL；
-2. Day 12 使用的 VLLM_TIMEOUT_SECONDS；
-3. 更早版本使用的 VLLM_TIMEOUT；
-4. 原 config.py 中的 settings.vllm_xxx 属性；
-5. Day 13 新增的 LLM、Embedding 和 Reranker 配置。
+为兼容既有部署，仍接受 `VLLM_*` 环境变量和
+`settings.vllm_*` 属性；新部署应优先使用 `LLM_*` 配置。
 """
 
 import os
@@ -244,8 +239,7 @@ MODEL_SERVICE_RETRY_DELAY_SECONDS = _get_positive_float(
 
 # 新配置优先使用 LLM_BASE_URL。
 #
-# 如果没有设置 LLM_BASE_URL，则继续读取 Day 12 使用的
-# VLLM_BASE_URL。
+# 如果没有设置 LLM_BASE_URL，则读取兼容变量 VLLM_BASE_URL。
 LLM_BASE_URL = _get_base_url(
     name="LLM_BASE_URL",
     default="http://127.0.0.1:6006",
@@ -356,7 +350,7 @@ LLM_SERVED_MODEL_NAME = _get_string(
 
 
 # ==================================================
-# Day 12 vLLM 配置兼容别名
+# vLLM 配置兼容别名
 # ==================================================
 
 # 兼容以下旧导入：
@@ -364,7 +358,6 @@ LLM_SERVED_MODEL_NAME = _get_string(
 # from app.config import VLLM_BASE_URL
 # from app.config import VLLM_TIMEOUT_SECONDS
 #
-# 现有 vllm_client.py 暂时不需要立即修改。
 VLLM_BASE_URL = LLM_BASE_URL
 VLLM_TIMEOUT_SECONDS = LLM_TIMEOUT_SECONDS
 

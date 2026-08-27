@@ -35,7 +35,7 @@ DisconnectChecker = Callable[[], Awaitable[bool]]
 class VLLMServiceError(ModelServiceError):
     """所有可转换为 Gateway 标准错误的 vLLM 异常基类。
 
-    保留 Day 12 的异常属性，同时接入 Day 13 的统一异常父类。
+    保留公开异常属性，并统一继承模型服务异常父类。
     """
 
     status_code = 502

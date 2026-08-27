@@ -186,10 +186,6 @@ class RAGClient:
             "status": "error",
             "answer": "",
             "sources": [],
-
-            # 旧 retrieve_node 临时兼容字段。
-            "documents": [],
-
             "llm_called": False,
             "evidence_sufficient": False,
             "allow_llm": False,
@@ -335,11 +331,6 @@ class RAGClient:
             "status": business_status,
             "answer": answer.strip(),
             "sources": sources,
-
-            # 旧 retrieve_node 临时兼容字段。
-            # 下一阶段修改 Node 后删除。
-            "documents": sources,
-
             "llm_called": bool(
                 data.get("llm_called", False)
             ),
@@ -397,8 +388,7 @@ class RAGClient:
         """
         调用 Industrial RAG /chat。
 
-        保留 retrieve 名称是为了兼容当前 retrieve_node，
-        后续可以重命名为 query_knowledge。
+        返回稳定的 answered、rejected 或 error 业务结果。
         """
 
         question = (

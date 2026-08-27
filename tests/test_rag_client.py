@@ -7,25 +7,16 @@ Industrial RAG Client 直接运行验收程序。
 
     python tests/test_rag_client.py
 
-2. 同时调用真实 Industrial RAG：
-
-    RAG_REAL_TEST=1 \
-    RAG_KB_ID=kb_ab50652fe3a4 \
-    python tests/test_rag_client.py
-
 特点：
 
-- 不依赖 pytest；
-- 打印每个测试用例的输入和输出；
-- 打印每一项检查结果；
-- 任意测试失败时进程退出码为 1；
-- 所有测试通过时进程退出码为 0。
+- 支持 Pytest 自动收集；
+- 直接运行时打印每个测试用例的输入和输出；
+- 不访问真实 RAG，真实链路由 test_agent_http_e2e.py 负责。
 """
 
 from __future__ import annotations
 
 import json
-import os
 import sys
 import traceback
 from pathlib import Path
@@ -51,6 +42,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 
 import httpx
+import pytest
 
 from agent.rag_client import RAGClient
 
@@ -260,7 +252,7 @@ def make_answered_response() -> httpx.Response:
 # C01：正常回答
 # ============================================================
 
-def case_answered_response() -> None:
+def test_answered_response() -> None:
     client = RAGClient(
         max_retries=0,
     )
@@ -378,7 +370,7 @@ def case_answered_response() -> None:
 # C02：证据不足
 # ============================================================
 
-def case_rejected_response() -> None:
+def test_rejected_response() -> None:
     client = RAGClient(
         max_retries=0,
     )
@@ -521,11 +513,55 @@ def case_http_error(
     )
 
 
+@pytest.mark.parametrize(
+    ("status_code", "body", "expected_code"),
+    [
+        (
+            400,
+            {"detail": "Knowledge Base 与设备型号不匹配"},
+            "RAG_INVALID_REQUEST",
+        ),
+        (
+            404,
+            {"detail": "Knowledge Base 不存在"},
+            "KNOWLEDGE_BASE_NOT_FOUND",
+        ),
+        (
+            409,
+            {"detail": "Knowledge Base 当前不可用于检索"},
+            "KNOWLEDGE_BASE_NOT_READY",
+        ),
+        (
+            504,
+            {
+                "status": "error",
+                "error": "LLM_TIMEOUT",
+                "message": "LLM 服务响应超时",
+                "request_id": "rag_timeout_id",
+            },
+            "RAG_UPSTREAM_TIMEOUT",
+        ),
+    ],
+)
+def test_http_error_mapping(
+    status_code: int,
+    body: dict[str, Any],
+    expected_code: str,
+) -> None:
+    """将 RAG HTTP 错误稳定映射为 Agent 业务错误。"""
+
+    case_http_error(
+        status_code=status_code,
+        body=body,
+        expected_code=expected_code,
+    )
+
+
 # ============================================================
 # C07：502重试成功
 # ============================================================
 
-def case_retry_then_success() -> None:
+def test_retry_then_success() -> None:
     client = RAGClient(
         max_retries=1,
     )
@@ -595,7 +631,7 @@ def case_retry_then_success() -> None:
 # C08：连接失败
 # ============================================================
 
-def case_connection_failure() -> None:
+def test_connection_failure() -> None:
     client = RAGClient(
         max_retries=1,
     )
@@ -663,7 +699,7 @@ def case_connection_failure() -> None:
 # C09：非法JSON
 # ============================================================
 
-def case_invalid_json() -> None:
+def test_invalid_json() -> None:
     client = RAGClient(
         max_retries=0,
     )
@@ -703,7 +739,7 @@ def case_invalid_json() -> None:
 # C10：请求字段缺失
 # ============================================================
 
-def case_invalid_request() -> None:
+def test_invalid_request() -> None:
     client = RAGClient(
         max_retries=1,
     )
@@ -754,76 +790,6 @@ def case_invalid_request() -> None:
 
 
 # ============================================================
-# R01：真实RAG调用
-# ============================================================
-
-def case_real_rag_call() -> None:
-    knowledge_base_id = os.getenv(
-        "RAG_KB_ID",
-        "",
-    ).strip()
-
-    if not knowledge_base_id:
-        raise ValueError(
-            "真实测试缺少 RAG_KB_ID 环境变量"
-        )
-
-    question = os.getenv(
-        "RAG_TEST_QUESTION",
-        "变频器温度太高时应该检查哪些方面？",
-    )
-
-    client = RAGClient()
-
-    request_data = {
-        "question": question,
-        "knowledge_base_id":
-            knowledge_base_id,
-        "device_model": "G120C",
-    }
-
-    show("Real RAG Request", request_data)
-
-    result = client.retrieve(
-        question,
-        knowledge_base_id,
-        "G120C",
-    )
-
-    show("Real RAG Result", result)
-
-    check(
-        result["success"] is True,
-        "真实RAG正确处理请求",
-        actual=result["success"],
-    )
-
-    check_equal(
-        result["status"],
-        "answered",
-        "已知问题返回 answered",
-    )
-
-    check(
-        bool(result["answer"]),
-        "真实回答不为空",
-        actual=result["answer"][:100],
-    )
-
-    check(
-        bool(result["sources"]),
-        "真实回答包含引用来源",
-        actual=len(result["sources"]),
-    )
-
-    check(
-        bool(result["rag_request_id"]),
-        "真实回答包含 RAG request_id",
-        actual=result["rag_request_id"],
-    )
-
-
-# ============================================================
 # Main
 # ============================================================
 
@@ -833,13 +799,13 @@ def main() -> None:
     runner.run(
         "C01",
         "正常 answered 响应",
-        case_answered_response,
+        test_answered_response,
     )
 
     runner.run(
         "C02",
         "证据不足 rejected 响应",
-        case_rejected_response,
+        test_rejected_response,
     )
 
     runner.run(
@@ -906,56 +872,26 @@ def main() -> None:
     runner.run(
         "C07",
         "HTTP 502后有限重试",
-        case_retry_then_success,
+        test_retry_then_success,
     )
 
     runner.run(
         "C08",
         "RAG连接失败",
-        case_connection_failure,
+        test_connection_failure,
     )
 
     runner.run(
         "C09",
         "RAG返回非法JSON",
-        case_invalid_json,
+        test_invalid_json,
     )
 
     runner.run(
         "C10",
         "请求字段缺失",
-        case_invalid_request,
+        test_invalid_request,
     )
-
-    real_test_enabled = (
-        os.getenv(
-            "RAG_REAL_TEST",
-            "0",
-        )
-        == "1"
-    )
-
-    if real_test_enabled:
-        runner.run(
-            "R01",
-            "真实 Industrial RAG 调用",
-            case_real_rag_call,
-        )
-    else:
-        print("\n")
-        print("=" * 80)
-        print("R01 | 真实 Industrial RAG 调用")
-        print("=" * 80)
-        print(
-            "[SKIPPED] RAG_REAL_TEST != 1"
-        )
-        print(
-            "如需运行真实测试，请设置："
-        )
-        print(
-            "RAG_REAL_TEST=1 "
-            "RAG_KB_ID=kb_ab50652fe3a4"
-        )
 
     runner.finish()
 

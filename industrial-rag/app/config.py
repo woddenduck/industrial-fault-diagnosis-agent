@@ -316,12 +316,10 @@ CONTEXT_TOKEN_BUDGET = settings.context_token_budget
 HISTORY_TOKEN_BUDGET = settings.history_token_budget
 
 # ============================================================
-# Day20 -> Day21 Compatibility Layer
+# FastAPI 入口兼容导出
 # ============================================================
 #
-# Day21 Stage2 已经将正式配置统一到 Settings + config/*.env。
-#
-# 但是 Day20 已验收通过的 app/main.py 仍然直接导入：
+# 正式配置统一由 Settings + config/*.env 管理，app/main.py 仍直接导入：
 #
 #   API_HOST
 #   API_PORT
@@ -338,11 +336,10 @@ HISTORY_TOKEN_BUDGET = settings.history_token_budget
 #   VECTOR_STORE_DIR
 #   ensure_runtime_directories
 #
-# 为避免 Day21 配置重构破坏 Day20 已验收业务接口，
-# 在这里提供兼容别名。
+# 这里集中提供对应导出，避免在业务入口重复解析环境变量。
 #
 # 注意：
-#   1. 新代码仍优先使用 settings / common.paths。
+#   1. 新代码优先使用 settings / common.paths。
 #   2. 这里不重新定义端口配置来源。
 #   3. 这里不在 import 阶段创建目录。
 # ============================================================
@@ -350,7 +347,7 @@ HISTORY_TOKEN_BUDGET = settings.history_token_budget
 
 def _resolve_compat_path(raw_value: str) -> Path:
     """
-    将 Stage2 中的路径配置转换为绝对 Path。
+    将路径配置转换为绝对 Path。
 
     相对路径始终相对于 PROJECT_ROOT，
     不依赖当前 shell 的 cwd。
@@ -382,8 +379,7 @@ APP_VERSION = os.getenv(
 # Industrial RAG API
 # ------------------------------------------------------------
 #
-# Day21 已经统一使用 RAG_PORT，
-# API_PORT 只作为 Day20 main.py 的兼容名称。
+# API_PORT 是 FastAPI 入口使用的 RAG_PORT 别名。
 # ------------------------------------------------------------
 
 API_HOST = os.getenv(
@@ -398,8 +394,7 @@ API_PORT = RAG_PORT
 # Gateway
 # ------------------------------------------------------------
 #
-# Stage2 配置中已经有 GATEWAY_PORT，
-# 因此不再独立写死 6008。
+# Gateway 地址从统一端口配置派生，不在此处写死。
 # ------------------------------------------------------------
 
 GATEWAY_BASE_URL = os.getenv(
@@ -446,13 +441,7 @@ RERANKER_MODEL = (
 # HTTP timeout compatibility
 # ------------------------------------------------------------
 #
-# Day21 已统一：
-#
-#   HTTP_TIMEOUT
-#   LLM_TIMEOUT
-#
-# Day20 main.py 中 HEALTH_TIMEOUT /
-# MODEL_QUERY_TIMEOUT 统一映射到 HTTP_TIMEOUT。
+# HEALTH_TIMEOUT 与 MODEL_QUERY_TIMEOUT 统一映射到 HTTP_TIMEOUT。
 # ------------------------------------------------------------
 
 HEALTH_TIMEOUT = HTTP_TIMEOUT
@@ -496,8 +485,7 @@ LOG_DIR = _resolve_compat_path(
 )
 
 
-# Day20 main.py 使用旧名称 VECTOR_STORE_DIR。
-# Day21 正式名称为 VECTOR_DB_DIR。
+# FastAPI 入口使用 VECTOR_STORE_DIR，底层正式名称为 VECTOR_DB_DIR。
 VECTOR_STORE_DIR = VECTOR_DB_DIR
 
 
@@ -514,9 +502,9 @@ TEMP_UPLOAD_DIR = (
 
 def ensure_runtime_directories() -> None:
     """
-    Day20 main.py 兼容入口。
+    FastAPI 启动时的运行目录初始化入口。
 
-    Day21 的正式目录生命周期管理仍由 common.paths 负责。
+    正式目录生命周期管理由 common.paths 负责。
 
     initialize_paths():
         1. 检查 DATA_DIR

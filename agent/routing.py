@@ -9,36 +9,6 @@ from agent.state import AgentState
 
 
 # ============================================================
-# 旧 Graph 临时兼容路由
-# ============================================================
-
-def route_after_information_check(
-    state: AgentState,
-) -> str:
-    """
-    当前旧 graph.py 仍使用：
-
-        ask_user / tool
-
-    下一阶段重建正式 Graph 后删除。
-    """
-
-    if state.get("missing_fields"):
-        return "ask_user"
-
-    if (
-        state.get("next_action")
-        == "ask_user"
-    ):
-        return "ask_user"
-
-    if state.get("device_id"):
-        return "tool"
-
-    return "ask_user"
-
-
-# ============================================================
 # 正式意图路由
 # ============================================================
 
@@ -48,8 +18,7 @@ def route_by_intent(
     """
     信息检查完成后，根据意图决定业务路径。
 
-    返回值是业务路径名称，
-    下一阶段由 graph.py 映射到对应 Node。
+    返回值是业务路径名称，由 graph.py 映射到对应 Node。
     """
 
     if state.get("missing_fields"):
@@ -216,9 +185,6 @@ def route_after_risk_check(
 
 
 
-# ============================================================
-# 在文件末尾增加报告后路由
-# ============================================================
 def route_after_report(
     state: AgentState,
 ) -> str:

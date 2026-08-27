@@ -307,10 +307,6 @@ def create_diagnostic_report(
         )
 
 
-    #
-    # Stage6 Action Tool Side Effect
-    #
-
     report_id = (
         "REPORT-"
         +

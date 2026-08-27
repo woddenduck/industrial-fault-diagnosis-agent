@@ -93,17 +93,38 @@ def test_04_test_layering() -> None:
     pyproject = _read("pyproject.toml")
 
     assert "test_agent_http_e2e.py" in conftest
-    assert "test_s01_device_status_tool_call" in conftest
-    assert "test_s02_maintenance_history_tool_call" in conftest
-    assert "test_s03_greeting_final_answer" in conftest
     assert "pytest.mark.e2e" in conftest
     assert "not e2e" in pyproject
 
+    current_offline_tests = [
+        "tests/test_agent_api.py",
+        "tests/test_agent_runner_runtime.py",
+        "tests/test_api_contract.py",
+        "tests/test_diagnosis_quality.py",
+        "tests/test_graph_workflow.py",
+        "tests/test_nodes.py",
+        "tests/test_rag_client.py",
+        "tests/test_routing.py",
+        "tests/test_state_contract.py",
+        "tests/test_tools.py",
+    ]
+    missing_tests = [
+        path for path in current_offline_tests
+        if not (PROJECT_ROOT / path).is_file()
+    ]
+    assert not missing_tests, f"缺少正式离线测试：{missing_tests}"
+
     superseded = [
+        "tests/test_agent_loop.py",
         "tests/test_agent_runner.py",
+        "tests/test_agent_safety.py",
+        "tests/test_intent_routing.py",
+        "tests/test_production_nodes.py",
         "tests/test_rag_node.py",
         "tests/test_risk_control.py",
+        "tests/test_structured_output.py",
         "tests/test_three_tool_agent.py",
+        "tests/tool_validation_test.py",
         "tests/graph_demo.py",
     ]
     remaining = [

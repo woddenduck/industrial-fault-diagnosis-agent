@@ -72,7 +72,7 @@ cp .env.example .env
 
 ```bash
 rsync -a \
-  ~/autodl-tmp/enterprise-llm-agent-platform/industrial-rag/data/ \
+  /path/to/old-project/industrial-rag/data/ \
   ./industrial-rag/data/
 ```
 

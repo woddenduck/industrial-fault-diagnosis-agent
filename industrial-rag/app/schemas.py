@@ -1,9 +1,4 @@
-"""
-Day 20 - Stage 6
-FastAPI Schemas
-
-只负责 HTTP 请求/响应的数据契约，不包含业务逻辑。
-"""
+"""Industrial RAG 的 HTTP 请求与响应契约。"""
 
 from __future__ import annotations
 
