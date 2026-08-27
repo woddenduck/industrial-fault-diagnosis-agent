@@ -49,13 +49,17 @@ def test_01_clean_release_boundary() -> None:
         ".git",
         ".ipynb_checkpoints",
     }
+    # 正式 GitHub 仓库的根目录必然包含 .git。
+    # 这里只禁止项目内部出现嵌套 Git 历史和缓存目录。
+    root_git = PROJECT_ROOT / ".git"
+
     found = [
         str(path.relative_to(PROJECT_ROOT))
         for path in PROJECT_ROOT.rglob("*")
-        if path.name in forbidden_names
+        if path.name in forbidden_names and path != root_git
     ]
 
-    assert not found, f"发布目录仍包含缓存或 Git 历史：{found}"
+    assert not found, f"发布目录仍包含缓存或嵌套 Git 历史：{found}"
     assert not (PROJECT_ROOT / "industrial-fault-diagnosis-agent").exists()
     print("结果：通过。发布副本不包含嵌套 Git 或旧版同名目录。")
 

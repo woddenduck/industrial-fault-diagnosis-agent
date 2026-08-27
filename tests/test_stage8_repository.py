@@ -132,7 +132,17 @@ def test_05_git_exclusion_policy() -> None:
 
     missing = [rule for rule in required_rules if rule not in gitignore]
     assert not missing, f".gitignore 缺少规则：{missing}"
-    assert not (PROJECT_ROOT / ".git").exists(), "发布副本不应携带 Git 历史"
+    # 根目录 .git 属于正式仓库自身，只禁止项目内部嵌套其他 Git 仓库。
+    root_git = PROJECT_ROOT / ".git"
+    nested_git_dirs = [
+        str(path.relative_to(PROJECT_ROOT))
+        for path in PROJECT_ROOT.rglob(".git")
+        if path != root_git
+    ]
+
+    assert not nested_git_dirs, (
+        f"发布仓库不应包含嵌套 Git 历史：{nested_git_dirs}"
+    )
 
     print("结果：通过。配置、模型、文档原件和运行数据不会进入 Git。")
 
