@@ -1,0 +1,13 @@
+# Industrial RAG 直接依赖；不保存整个环境的 pip freeze
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+pydantic>=2.9,<3.0
+requests>=2.32,<3.0
+python-dotenv>=1.0,<2.0
+python-multipart>=0.0.12,<1.0
+chromadb==0.6.3
+rank-bm25==0.2.2
+jieba==0.42.1
+pymupdf>=1.24,<2.0
+transformers>=4.55,<5.0
+numpy>=1.26,<3.0

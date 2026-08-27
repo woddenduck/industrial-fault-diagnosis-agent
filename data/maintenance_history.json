@@ -1,0 +1,59 @@
+{
+  "DEVICE-001": [
+    {
+      "record_id": "MNT-001",
+      "date": "2026-06-12",
+      "type": "inspection",
+      "description": "Routine inspection completed.",
+      "result": "normal"
+    }
+  ],
+  "DEVICE-002": [],
+  "DEVICE-003": [
+    {
+      "record_id": "MNT-002",
+      "date": "2026-07-03",
+      "type": "repair",
+      "description": "Communication module replaced.",
+      "result": "resolved"
+    },
+    {
+      "record_id": "MNT-003",
+      "date": "2026-08-02",
+      "type": "inspection",
+      "description": "Intermittent communication loss detected.",
+      "result": "monitoring"
+    }
+  ],
+  "DEVICE-004": [
+    {
+      "record_id": "MNT-004",
+      "date": "2026-04-20",
+      "type": "repair",
+      "description": "Bearing replaced due to excessive vibration.",
+      "result": "resolved"
+    },
+    {
+      "record_id": "MNT-005",
+      "date": "2026-05-28",
+      "type": "repair",
+      "description": "Cooling system cleaned after overheating.",
+      "result": "resolved"
+    },
+    {
+      "record_id": "MNT-006",
+      "date": "2026-07-19",
+      "type": "inspection",
+      "description": "High vibration detected again.",
+      "result": "monitoring"
+    },
+    {
+      "record_id": "MNT-007",
+      "date": "2026-08-15",
+      "type": "repair",
+      "description": "Emergency maintenance after overheating alarm.",
+      "result": "monitoring"
+    }
+  ],
+  "DEVICE-005": []
+}

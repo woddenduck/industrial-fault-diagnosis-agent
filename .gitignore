@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# 虚拟环境与本机配置
+.env
+.venv/
+venv/
+env/
+.conda/
+
+# IDE 与系统文件
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/
+
+# 模型、缓存和运行日志
+.cache/
+models/
+logs/
+*.log
+deployment/run/
+*.pid
+
+# RAG 运行数据与知识库产物
+industrial-rag/data/.tmp_uploads/
+industrial-rag/data/uploads/
+industrial-rag/data/chunks/
+industrial-rag/data/bm25/
+industrial-rag/data/vector_store/
+industrial-rag/data/documents.json
+industrial-rag/data/knowledge_base.json
+industrial-rag/logs/
+industrial-rag/models/
+industrial-rag/reports/
+
+# 大文件与模型权重
+*.pdf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pkl
+
+# 临时文件与备份
+*.tmp
+*.bak
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Agent 运行报告
+reports/

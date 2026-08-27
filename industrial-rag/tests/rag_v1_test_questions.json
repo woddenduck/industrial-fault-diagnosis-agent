@@ -1,0 +1,167 @@
+[
+  {
+    "question_id": "Q01",
+    "category": "normal_answer",
+    "question": "变频器温度太高时应该检查哪些方面？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "G120C",
+    "expected": {
+      "should_answer": true,
+      "should_call_llm": true,
+      "expected_chunks": [],
+      "expected_keywords": [
+        "温度"
+      ],
+      "device_model": "G120C",
+      "should_refuse": false
+    }
+  },
+  {
+    "question_id": "Q02",
+    "category": "normal_answer",
+    "question": "如果变频器不再响应，应该如何恢复？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "G120C",
+    "expected": {
+      "should_answer": true,
+      "should_call_llm": true,
+      "expected_chunks": [],
+      "expected_keywords": [
+        "电源",
+        "LED"
+      ],
+      "device_model": "G120C",
+      "should_refuse": false
+    }
+  },
+  {
+    "question_id": "Q03",
+    "category": "normal_answer",
+    "question": "G120C 变频器过热可能由哪些因素引起？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "G120C",
+    "expected": {
+      "should_answer": true,
+      "should_call_llm": true,
+      "expected_chunks": [],
+      "expected_keywords": [
+        "温度"
+      ],
+      "device_model": "G120C",
+      "should_refuse": false
+    }
+  },
+  {
+    "question_id": "Q04",
+    "category": "normal_answer",
+    "question": "G120C 的温度监控主要包括哪些方面？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "G120C",
+    "expected": {
+      "should_answer": true,
+      "should_call_llm": true,
+      "expected_chunks": [],
+      "expected_keywords": [
+        "温度"
+      ],
+      "device_model": "G120C",
+      "should_refuse": false
+    }
+  },
+  {
+    "question_id": "Q05",
+    "category": "fault_code",
+    "question": "G120C 出现 F30021 是什么故障？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "G120C",
+    "expected": {
+      "should_answer": true,
+      "should_call_llm": true,
+      "expected_chunks": [],
+      "expected_keywords": [
+        "F30021"
+      ],
+      "device_model": "G120C",
+      "should_refuse": false
+    }
+  },
+  {
+    "question_id": "Q06",
+    "category": "fault_code",
+    "question": "G120C 出现 F30021 后应该如何排查？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "G120C",
+    "expected": {
+      "should_answer": true,
+      "should_call_llm": true,
+      "expected_chunks": [],
+      "expected_keywords": [
+        "F30021"
+      ],
+      "device_model": "G120C",
+      "should_refuse": false
+    }
+  },
+  {
+    "question_id": "Q07",
+    "category": "device_filter",
+    "question": "G120C 变频器发生过温时如何检查？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "G120C",
+    "expected": {
+      "should_answer": true,
+      "should_call_llm": true,
+      "expected_chunks": [],
+      "expected_keywords": [
+        "温度"
+      ],
+      "device_model": "G120C",
+      "should_refuse": false
+    }
+  },
+  {
+    "question_id": "Q08",
+    "category": "device_filter",
+    "question": "E300 设备出现过热应该怎么办？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "E300",
+    "expected": {
+      "should_answer": false,
+      "should_call_llm": false,
+      "expected_chunks": [],
+      "expected_keywords": [],
+      "device_model": "E300",
+      "should_refuse": true
+    }
+  },
+  {
+    "question_id": "Q09",
+    "category": "no_answer",
+    "question": "G120C 如何通过量子通信自动修复功率模块？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "G120C",
+    "expected": {
+      "should_answer": false,
+      "should_call_llm": false,
+      "expected_chunks": [],
+      "expected_keywords": [],
+      "device_model": "G120C",
+      "should_refuse": true
+    }
+  },
+  {
+    "question_id": "Q10",
+    "category": "device_conflict",
+    "question": "S120 出现 F30021 时应该如何处理？",
+    "knowledge_base_id": "kb_ab50652fe3a4",
+    "device_model": "S120",
+    "expected": {
+      "should_answer": false,
+      "should_call_llm": false,
+      "expected_chunks": [],
+      "expected_keywords": [],
+      "device_model": "S120",
+      "should_refuse": true
+    }
+  }
+]

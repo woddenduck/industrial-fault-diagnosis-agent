@@ -1,0 +1,18 @@
+[project]
+name = "industrial-fault-diagnosis-agent"
+version = "1.0.0"
+description = "基于 LangGraph、Hybrid RAG 和 Tool Calling 的工业设备故障诊断 Agent"
+readme = "README.md"
+requires-python = ">=3.10,<3.12"
+authors = [
+    {name = "Xing Zhaowang"},
+]
+dependencies = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra -m 'not e2e'"
+markers = [
+    "e2e: 需要已经启动的真实 RAG、Agent 和模型服务",
+]

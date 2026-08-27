@@ -1,0 +1,2 @@
+# vLLM 对 CUDA 与 PyTorch 版本敏感，安装前请先阅读 docs/deployment.md。
+vllm>=0.8,<1.0
