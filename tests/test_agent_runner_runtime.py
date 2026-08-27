@@ -1,6 +1,6 @@
-"""关卡 6.2：Agent Runner 运行边界验收。
+"""Agent Runner 运行边界离线验收。
 
-本测试直接通过 Python 运行，不依赖 pytest。
+本测试既支持 Pytest 自动收集，也支持直接使用 Python 运行。
 
 测试使用假的 Graph，不会访问：
 
@@ -178,7 +178,7 @@ def completed_updates() -> dict[str, Any]:
     }
 
 
-def case_complete_request_mapping() -> None:
+def test_complete_request_mapping() -> None:
     request = DiagnoseRequest(
         query="  请综合诊断 DEVICE-001 当前温度异常  ",
         device_id=" device-001 ",
@@ -292,7 +292,7 @@ def case_complete_request_mapping() -> None:
     )
 
 
-def case_default_configuration() -> None:
+def test_default_configuration() -> None:
     request = DiagnoseRequest(
         query="查询变频器过热原因"
     )
@@ -336,7 +336,7 @@ def case_default_configuration() -> None:
     )
 
 
-def case_needs_input() -> None:
+def test_needs_input() -> None:
     graph = FakeGraph(
         updates={
             "status": "running",
@@ -375,7 +375,7 @@ def case_needs_input() -> None:
     )
 
 
-def case_insufficient_evidence() -> None:
+def test_insufficient_evidence() -> None:
     graph = FakeGraph(
         updates={
             "status": "insufficient_evidence",
@@ -429,7 +429,7 @@ def case_insufficient_evidence() -> None:
     )
 
 
-def case_human_review() -> None:
+def test_human_review() -> None:
     graph = FakeGraph(
         updates={
             "status": "running",
@@ -479,7 +479,7 @@ def case_human_review() -> None:
     )
 
 
-def case_graph_business_failure() -> None:
+def test_graph_business_failure() -> None:
     graph = FakeGraph(
         updates={
             "status": "failed",
@@ -541,7 +541,7 @@ def case_graph_business_failure() -> None:
     )
 
 
-def case_graph_exception() -> None:
+def test_graph_exception() -> None:
     graph = FakeGraph(
         exception=TimeoutError(
             "模拟 Graph 执行超时"
@@ -588,7 +588,7 @@ def case_graph_exception() -> None:
     )
 
 
-def case_invalid_graph_result() -> None:
+def test_invalid_graph_result() -> None:
     graph = FakeGraph(
         result="这不是合法的 Graph State"
     )
@@ -621,7 +621,7 @@ def case_invalid_graph_result() -> None:
     )
 
 
-def case_invalid_terminal_state() -> None:
+def test_invalid_terminal_state() -> None:
     graph = FakeGraph(
         updates={
             "status": "running",
@@ -666,7 +666,7 @@ def case_invalid_terminal_state() -> None:
     )
 
 
-def case_internal_fields_not_exposed() -> None:
+def test_internal_fields_not_exposed() -> None:
     updates = completed_updates()
 
     updates.update(
@@ -681,12 +681,6 @@ def case_internal_fields_not_exposed() -> None:
             "history_summary": "内部摘要",
             "rag_answer": "内部 RAG 原始回答",
             "missing_fields": ["internal_field"],
-            "retrieved_documents": [
-                {
-                    "raw_content": "内部检索文档"
-                }
-            ],
-            "mock_diagnosis": "内部模拟诊断",
             "internal_prompt": "内部提示词",
         }
     )
@@ -715,8 +709,6 @@ def case_internal_fields_not_exposed() -> None:
         "history_summary",
         "rag_answer",
         "missing_fields",
-        "retrieved_documents",
-        "mock_diagnosis",
         "internal_prompt",
     }
 
@@ -736,7 +728,7 @@ def case_internal_fields_not_exposed() -> None:
     )
 
 
-def case_invalid_request_rejected_before_graph() -> None:
+def test_invalid_request_rejected_before_graph() -> None:
     graph = FakeGraph(
         updates=completed_updates()
     )
@@ -768,7 +760,7 @@ def case_invalid_request_rejected_before_graph() -> None:
     )
 
 
-def case_request_id_generated() -> None:
+def test_request_id_generated() -> None:
     graph = FakeGraph(
         updates={
             "status": "completed",
@@ -825,62 +817,62 @@ TEST_CASES = [
     (
         "R01",
         "完整请求正确转换并返回完成响应",
-        case_complete_request_mapping,
+        test_complete_request_mapping,
     ),
     (
         "R02",
         "缺省字段使用统一配置",
-        case_default_configuration,
+        test_default_configuration,
     ),
     (
         "R03",
         "缺少必要信息时返回 needs_input",
-        case_needs_input,
+        test_needs_input,
     ),
     (
         "R04",
         "RAG 证据不足状态正常返回",
-        case_insufficient_evidence,
+        test_insufficient_evidence,
     ),
     (
         "R05",
         "高风险结果进入人工复核",
-        case_human_review,
+        test_human_review,
     ),
     (
         "R06",
         "Graph 业务失败状态完整保留",
-        case_graph_business_failure,
+        test_graph_business_failure,
     ),
     (
         "R07",
         "Graph 抛出异常时安全收口",
-        case_graph_exception,
+        test_graph_exception,
     ),
     (
         "R08",
         "Graph 返回非法类型时安全收口",
-        case_invalid_graph_result,
+        test_invalid_graph_result,
     ),
     (
         "R09",
         "Graph 未进入合法终态时安全收口",
-        case_invalid_terminal_state,
+        test_invalid_terminal_state,
     ),
     (
         "R10",
         "内部 State 字段不会泄漏",
-        case_internal_fields_not_exposed,
+        test_internal_fields_not_exposed,
     ),
     (
         "R11",
         "非法请求不会进入 Graph",
-        case_invalid_request_rejected_before_graph,
+        test_invalid_request_rejected_before_graph,
     ),
     (
         "R12",
         "缺少 Request ID 时自动生成",
-        case_request_id_generated,
+        test_request_id_generated,
     ),
 ]
 
@@ -896,9 +888,9 @@ def main() -> int:
     passed = 0
     failed = 0
 
-    for case_id, title, test_func in TEST_CASES:
+    for test_id, title, test_func in TEST_CASES:
         print(f"\n{SEPARATOR}")
-        print(f"{case_id} | {title}")
+        print(f"{test_id} | {title}")
         print(SEPARATOR)
 
         try:

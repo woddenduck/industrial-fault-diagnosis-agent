@@ -92,11 +92,6 @@ class AgentState(TypedDict, total=False):
     errors: list[AgentErrorItem]
     execution_trace: list[TraceItem]
 
-    # 临时兼容字段，完成生产 Graph 后删除
-    retrieved_documents: list[dict[str, Any]]
-    mock_diagnosis: str
-
-
 def create_initial_state(
     *,
     user_query: str,
@@ -155,8 +150,4 @@ def create_initial_state(
         "error": "",
         "errors": [],
         "execution_trace": [],
-
-        # 旧 Graph 临时兼容
-        "retrieved_documents": [],
-        "mock_diagnosis": "",
     }

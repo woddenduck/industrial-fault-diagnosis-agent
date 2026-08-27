@@ -12,7 +12,6 @@ from typing import Any, Callable
 
 from agent.config import DEFAULT_DEVICE_MODEL
 from agent.errors import (
-    NODE_EXECUTION_ERROR,
     REPORT_GENERATION_ERROR,
     RAG_EXECUTION_ERROR,
     TOOL_EXECUTION_ERROR,
@@ -450,7 +449,6 @@ def retrieve_node(state: AgentState) -> dict[str, Any]:
             rag_request_id="",
             rag_decision={},
             sources=[],
-            retrieved_documents=[],
             degraded=False,
         )
 
@@ -465,7 +463,6 @@ def retrieve_node(state: AgentState) -> dict[str, Any]:
             rag_request_id="",
             rag_decision={},
             sources=[],
-            retrieved_documents=[],
             degraded=False,
         )
 
@@ -485,7 +482,6 @@ def retrieve_node(state: AgentState) -> dict[str, Any]:
             rag_request_id=rag_request_id,
             rag_decision={},
             sources=[],
-            retrieved_documents=[],
             degraded=False,
         )
 
@@ -499,7 +495,6 @@ def retrieve_node(state: AgentState) -> dict[str, Any]:
         if isinstance(result.get("decision"), dict)
         else {},
         "sources": sources,
-        "retrieved_documents": sources,
         "degraded": bool(result.get("degraded", False)),
         "error": "",
     }
@@ -520,7 +515,6 @@ def retrieve_node(state: AgentState) -> dict[str, Any]:
         return {
             **common,
             "sources": [],
-            "retrieved_documents": [],
             "status": "insufficient_evidence",
             "next_action": "final_answer",
             "execution_trace": _append_trace(
@@ -541,7 +535,6 @@ def retrieve_node(state: AgentState) -> dict[str, Any]:
         rag_request_id=rag_request_id,
         rag_decision={},
         sources=[],
-        retrieved_documents=[],
         degraded=False,
     )
 

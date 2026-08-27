@@ -1,13 +1,10 @@
-"""Gate 6.1: API schema contract tests.
+"""Agent API Schema 契约离线验收。
 
-Run from the project root:
+可由 Pytest 自动收集，也可以在项目根目录直接运行：
 
     python tests/test_api_contract.py
 
-This is intentionally a directly executable test program rather than a pytest
-test module.  It prints every case, payload, validation result, and final
-summary so the API contract can be inspected before the runtime/API layers are
-built.
+直接运行时会打印每个用例、载荷、校验结果和最终汇总。
 """
 
 from __future__ import annotations
@@ -79,7 +76,7 @@ def expect_validation_error(
     raise AssertionError("预期产生 ValidationError，但数据被错误接受")
 
 
-def case_minimal_request() -> None:
+def test_minimal_request() -> None:
     payload = {"query": "  查询设备当前状态  "}
     print_json("Input", payload)
 
@@ -93,7 +90,7 @@ def case_minimal_request() -> None:
     check(request.create_report is False, "create_report 缺省值为 False")
 
 
-def case_full_request() -> None:
+def test_full_request() -> None:
     payload = {
         "query": "  请综合诊断 DEVICE-001 当前温度异常  ",
         "device_id": " device-001 ",
@@ -121,25 +118,25 @@ def case_full_request() -> None:
     check(request.create_report is True, "保留报告生成开关")
 
 
-def case_blank_query_rejected() -> None:
+def test_blank_query_rejected() -> None:
     payload = {"query": "   "}
     print_json("Input", payload)
     expect_validation_error(lambda: DiagnoseRequest.model_validate(payload), ("query",))
 
 
-def case_oversized_query_rejected() -> None:
+def test_oversized_query_rejected() -> None:
     payload = {"query": "故" * 4001}
     print_json("Input Summary", {"query_length": len(payload["query"])})
     expect_validation_error(lambda: DiagnoseRequest.model_validate(payload), ("query",))
 
 
-def case_invalid_device_id_rejected() -> None:
+def test_invalid_device_id_rejected() -> None:
     payload = {"query": "查询设备状态", "device_id": "pump-01"}
     print_json("Input", payload)
     expect_validation_error(lambda: DiagnoseRequest.model_validate(payload), ("device_id",))
 
 
-def case_empty_optional_values_become_none() -> None:
+def test_empty_optional_values_become_none() -> None:
     payload = {
         "query": "查询设备状态",
         "device_id": "   ",
@@ -158,13 +155,13 @@ def case_empty_optional_values_become_none() -> None:
     check(request.history_summary is None, "空 history_summary 归一化为 None")
 
 
-def case_extra_request_field_rejected() -> None:
+def test_extra_request_field_rejected() -> None:
     payload = {"query": "查询设备状态", "unexpected_field": "not-allowed"}
     print_json("Input", payload)
     expect_validation_error(lambda: DiagnoseRequest.model_validate(payload), ("unexpected_field",))
 
 
-def case_invalid_history_role_rejected() -> None:
+def test_invalid_history_role_rejected() -> None:
     payload = {
         "query": "继续诊断",
         "history": [{"role": "system", "content": "不允许客户端注入系统消息"}],
@@ -173,7 +170,7 @@ def case_invalid_history_role_rejected() -> None:
     expect_validation_error(lambda: DiagnoseRequest.model_validate(payload), ("history", 0, "role"))
 
 
-def case_blank_history_content_rejected() -> None:
+def test_blank_history_content_rejected() -> None:
     payload = {
         "query": "继续诊断",
         "history": [{"role": "user", "content": "   "}],
@@ -182,7 +179,7 @@ def case_blank_history_content_rejected() -> None:
     expect_validation_error(lambda: DiagnoseRequest.model_validate(payload), ("history", 0, "content"))
 
 
-def case_too_many_history_messages_rejected() -> None:
+def test_too_many_history_messages_rejected() -> None:
     payload = {
         "query": "继续诊断",
         "history": [
@@ -248,7 +245,7 @@ def build_completed_response_payload() -> dict[str, Any]:
     }
 
 
-def case_completed_response() -> None:
+def test_completed_response() -> None:
     payload = build_completed_response_payload()
     print_json("Input", payload)
 
@@ -264,7 +261,7 @@ def case_completed_response() -> None:
     check(response.elapsed_ms == 14637.0, "保留毫秒级执行耗时")
 
 
-def case_human_review_response() -> None:
+def test_human_review_response() -> None:
     payload = build_completed_response_payload()
     payload.update(
         {
@@ -287,7 +284,7 @@ def case_human_review_response() -> None:
     check(response.next_action == "awaiting_human_review", "保留人工复核后续动作")
 
 
-def case_failed_response_with_structured_error() -> None:
+def test_failed_response_with_structured_error() -> None:
     payload = {
         "request_id": "req-contract-003",
         "status": "failed",
@@ -319,42 +316,42 @@ def case_failed_response_with_structured_error() -> None:
     check(response.errors[0].retryable is True, "保留错误可重试标记")
 
 
-def case_invalid_response_status_rejected() -> None:
+def test_invalid_response_status_rejected() -> None:
     payload = build_completed_response_payload()
     payload["status"] = "success"
     print_json("Input Summary", {"status": payload["status"]})
     expect_validation_error(lambda: DiagnoseResponse.model_validate(payload), ("status",))
 
 
-def case_invalid_intent_rejected() -> None:
+def test_invalid_intent_rejected() -> None:
     payload = build_completed_response_payload()
     payload["intent"] = "delete_device"
     print_json("Input Summary", {"intent": payload["intent"]})
     expect_validation_error(lambda: DiagnoseResponse.model_validate(payload), ("intent",))
 
 
-def case_invalid_rag_status_rejected() -> None:
+def test_invalid_rag_status_rejected() -> None:
     payload = build_completed_response_payload()
     payload["rag_status"] = "success"
     print_json("Input Summary", {"rag_status": payload["rag_status"]})
     expect_validation_error(lambda: DiagnoseResponse.model_validate(payload), ("rag_status",))
 
 
-def case_invalid_risk_level_rejected() -> None:
+def test_invalid_risk_level_rejected() -> None:
     payload = build_completed_response_payload()
     payload["risk_level"] = "dangerous"
     print_json("Input Summary", {"risk_level": payload["risk_level"]})
     expect_validation_error(lambda: DiagnoseResponse.model_validate(payload), ("risk_level",))
 
 
-def case_missing_request_id_rejected() -> None:
+def test_missing_request_id_rejected() -> None:
     payload = build_completed_response_payload()
     payload.pop("request_id")
     print_json("Input Summary", {"request_id_present": False})
     expect_validation_error(lambda: DiagnoseResponse.model_validate(payload), ("request_id",))
 
 
-def case_extra_response_field_rejected() -> None:
+def test_extra_response_field_rejected() -> None:
     payload = build_completed_response_payload()
     payload["internal_prompt"] = "不应暴露的内部字段"
     print_json("Input Summary", {"extra_field": "internal_prompt"})
@@ -362,25 +359,25 @@ def case_extra_response_field_rejected() -> None:
 
 
 TEST_CASES: list[tuple[str, str, Callable[[], None]]] = [
-    ("C01", "最小合法请求采用稳定默认值", case_minimal_request),
-    ("C02", "完整请求完成清洗和嵌套模型转换", case_full_request),
-    ("C03", "纯空白 query 被拒绝", case_blank_query_rejected),
-    ("C04", "超过 4000 字符的 query 被拒绝", case_oversized_query_rejected),
-    ("C05", "非标准 device_id 被拒绝", case_invalid_device_id_rejected),
-    ("C06", "空白可选字符串统一转换为 None", case_empty_optional_values_become_none),
-    ("C07", "请求中的未知字段被拒绝", case_extra_request_field_rejected),
-    ("C08", "history 禁止 system 角色", case_invalid_history_role_rejected),
-    ("C09", "history 禁止空白正文", case_blank_history_content_rejected),
-    ("C10", "history 最多接受 20 条消息", case_too_many_history_messages_rejected),
-    ("C11", "完整 completed 响应通过契约校验", case_completed_response),
-    ("C12", "critical 响应保留人工复核状态", case_human_review_response),
-    ("C13", "failed 响应保留结构化错误", case_failed_response_with_structured_error),
-    ("C14", "非法响应 status 被拒绝", case_invalid_response_status_rejected),
-    ("C15", "非法 intent 被拒绝", case_invalid_intent_rejected),
-    ("C16", "非法 rag_status 被拒绝", case_invalid_rag_status_rejected),
-    ("C17", "非法 risk_level 被拒绝", case_invalid_risk_level_rejected),
-    ("C18", "缺失 request_id 的响应被拒绝", case_missing_request_id_rejected),
-    ("C19", "响应中的未知字段被拒绝", case_extra_response_field_rejected),
+    ("C01", "最小合法请求采用稳定默认值", test_minimal_request),
+    ("C02", "完整请求完成清洗和嵌套模型转换", test_full_request),
+    ("C03", "纯空白 query 被拒绝", test_blank_query_rejected),
+    ("C04", "超过 4000 字符的 query 被拒绝", test_oversized_query_rejected),
+    ("C05", "非标准 device_id 被拒绝", test_invalid_device_id_rejected),
+    ("C06", "空白可选字符串统一转换为 None", test_empty_optional_values_become_none),
+    ("C07", "请求中的未知字段被拒绝", test_extra_request_field_rejected),
+    ("C08", "history 禁止 system 角色", test_invalid_history_role_rejected),
+    ("C09", "history 禁止空白正文", test_blank_history_content_rejected),
+    ("C10", "history 最多接受 20 条消息", test_too_many_history_messages_rejected),
+    ("C11", "完整 completed 响应通过契约校验", test_completed_response),
+    ("C12", "critical 响应保留人工复核状态", test_human_review_response),
+    ("C13", "failed 响应保留结构化错误", test_failed_response_with_structured_error),
+    ("C14", "非法响应 status 被拒绝", test_invalid_response_status_rejected),
+    ("C15", "非法 intent 被拒绝", test_invalid_intent_rejected),
+    ("C16", "非法 rag_status 被拒绝", test_invalid_rag_status_rejected),
+    ("C17", "非法 risk_level 被拒绝", test_invalid_risk_level_rejected),
+    ("C18", "缺失 request_id 的响应被拒绝", test_missing_request_id_rejected),
+    ("C19", "响应中的未知字段被拒绝", test_extra_response_field_rejected),
 ]
 
 
@@ -392,9 +389,9 @@ def main() -> int:
     passed = 0
     failed = 0
 
-    for case_id, title, test_func in TEST_CASES:
+    for test_id, title, test_func in TEST_CASES:
         print(f"\n{SEPARATOR}")
-        print(f"{case_id} | {title}")
+        print(f"{test_id} | {title}")
         print(SEPARATOR)
 
         try:

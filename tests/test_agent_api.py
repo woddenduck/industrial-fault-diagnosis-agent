@@ -1,6 +1,6 @@
-"""关卡 6.3：Agent FastAPI 接口验收。
+"""Agent FastAPI 接口离线验收。
 
-本测试直接使用 Python 运行，不依赖 pytest。
+本测试既支持 Pytest 自动收集，也支持直接使用 Python 运行。
 
 测试使用：
 
@@ -260,7 +260,7 @@ def check_generated_request_id(
     )
 
 
-def case_health_healthy() -> None:
+def test_health_healthy() -> None:
     runner = FakeRunner()
 
     with make_client(runner) as client:
@@ -296,7 +296,7 @@ def case_health_healthy() -> None:
     )
 
 
-def case_health_degraded() -> None:
+def test_health_degraded() -> None:
     runner = FakeRunner()
 
     with make_client(
@@ -334,7 +334,7 @@ def case_health_degraded() -> None:
     )
 
 
-def case_graph_info() -> None:
+def test_graph_info() -> None:
     runner = FakeRunner()
 
     with make_client(runner) as client:
@@ -376,7 +376,7 @@ def case_graph_info() -> None:
     )
 
 
-def case_completed_diagnosis() -> None:
+def test_completed_diagnosis() -> None:
     runner = FakeRunner()
 
     request_payload = {
@@ -450,7 +450,7 @@ def case_completed_diagnosis() -> None:
     )
 
 
-def case_request_id_generated() -> None:
+def test_request_id_generated() -> None:
     runner = FakeRunner()
 
     with make_client(runner) as client:
@@ -487,7 +487,7 @@ def case_request_id_generated() -> None:
     )
 
 
-def case_invalid_request_id_replaced() -> None:
+def test_invalid_request_id_replaced() -> None:
     runner = FakeRunner()
 
     invalid_request_id = (
@@ -529,7 +529,7 @@ def case_invalid_request_id_replaced() -> None:
     )
 
 
-def case_validation_error() -> None:
+def test_validation_error() -> None:
     runner = FakeRunner()
 
     invalid_payload = {
@@ -573,7 +573,7 @@ def case_validation_error() -> None:
     )
 
 
-def case_needs_input() -> None:
+def test_needs_input() -> None:
     runner = FakeRunner(
         response_template={
             "status": "needs_input",
@@ -617,7 +617,7 @@ def case_needs_input() -> None:
     )
 
 
-def case_insufficient_evidence() -> None:
+def test_insufficient_evidence() -> None:
     runner = FakeRunner(
         response_template={
             "status": "insufficient_evidence",
@@ -670,7 +670,7 @@ def case_insufficient_evidence() -> None:
     )
 
 
-def case_human_review() -> None:
+def test_human_review() -> None:
     runner = FakeRunner(
         response_template={
             "status": "human_review_required",
@@ -802,35 +802,35 @@ def assert_failed_http_mapping(
     )
 
 
-def case_device_not_found() -> None:
+def test_device_not_found() -> None:
     assert_failed_http_mapping(
         error_code="DEVICE_NOT_FOUND",
         expected_http_status=404,
     )
 
 
-def case_rag_unavailable() -> None:
+def test_rag_unavailable() -> None:
     assert_failed_http_mapping(
         error_code="RAG_UNAVAILABLE",
         expected_http_status=503,
     )
 
 
-def case_rag_timeout() -> None:
+def test_rag_timeout() -> None:
     assert_failed_http_mapping(
         error_code="RAG_TIMEOUT",
         expected_http_status=504,
     )
 
 
-def case_unknown_failure() -> None:
+def test_unknown_failure() -> None:
     assert_failed_http_mapping(
         error_code="AGENT_RUNTIME_ERROR",
         expected_http_status=500,
     )
 
 
-def case_unhandled_api_exception() -> None:
+def test_unhandled_api_exception() -> None:
     runner = FakeRunner(
         exception=RuntimeError(
             "模拟 API 未处理异常"
@@ -891,77 +891,77 @@ TEST_CASES = [
     (
         "A01",
         "RAG 正常时健康检查返回 healthy",
-        case_health_healthy,
+        test_health_healthy,
     ),
     (
         "A02",
         "RAG 不可用时健康检查返回 degraded",
-        case_health_degraded,
+        test_health_degraded,
     ),
     (
         "A03",
         "Graph 信息接口返回节点和意图",
-        case_graph_info,
+        test_graph_info,
     ),
     (
         "A04",
         "正常诊断返回 HTTP 200",
-        case_completed_diagnosis,
+        test_completed_diagnosis,
     ),
     (
         "A05",
         "缺少 Request ID 时自动生成",
-        case_request_id_generated,
+        test_request_id_generated,
     ),
     (
         "A06",
         "非法 Request ID 被安全替换",
-        case_invalid_request_id_replaced,
+        test_invalid_request_id_replaced,
     ),
     (
         "A07",
         "非法请求返回 HTTP 422",
-        case_validation_error,
+        test_validation_error,
     ),
     (
         "A08",
         "needs_input 返回 HTTP 200",
-        case_needs_input,
+        test_needs_input,
     ),
     (
         "A09",
         "证据不足返回 HTTP 200",
-        case_insufficient_evidence,
+        test_insufficient_evidence,
     ),
     (
         "A10",
         "人工复核返回 HTTP 200",
-        case_human_review,
+        test_human_review,
     ),
     (
         "A11",
         "设备不存在映射为 HTTP 404",
-        case_device_not_found,
+        test_device_not_found,
     ),
     (
         "A12",
         "RAG 不可用映射为 HTTP 503",
-        case_rag_unavailable,
+        test_rag_unavailable,
     ),
     (
         "A13",
         "RAG 超时映射为 HTTP 504",
-        case_rag_timeout,
+        test_rag_timeout,
     ),
     (
         "A14",
         "未知运行失败映射为 HTTP 500",
-        case_unknown_failure,
+        test_unknown_failure,
     ),
     (
         "A15",
         "API 未处理异常统一收口",
-        case_unhandled_api_exception,
+        test_unhandled_api_exception,
     ),
 ]
 
@@ -978,9 +978,9 @@ def main() -> int:
     passed = 0
     failed = 0
 
-    for case_id, title, test_func in TEST_CASES:
+    for test_id, title, test_func in TEST_CASES:
         print(f"\n{SEPARATOR}")
-        print(f"{case_id} | {title}")
+        print(f"{test_id} | {title}")
         print(SEPARATOR)
 
         try:

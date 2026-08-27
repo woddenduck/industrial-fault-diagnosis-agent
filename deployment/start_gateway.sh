@@ -58,7 +58,7 @@ validate_http_url "LLM_BASE_URL" "${LLM_BASE_URL}"
 validate_http_url "EMBEDDING_BASE_URL" "${EMBEDDING_BASE_URL}"
 validate_http_url "RERANKER_BASE_URL" "${RERANKER_BASE_URL}"
 
-# 兼容 Day 12 中仍读取 VLLM_* 的旧 Gateway 配置。
+# 为既有 Gateway 配置导出 VLLM_* 兼容变量。
 export VLLM_BASE_URL="${LLM_BASE_URL}"
 export VLLM_TIMEOUT_SECONDS="${LLM_TIMEOUT_SECONDS:-120}"
 

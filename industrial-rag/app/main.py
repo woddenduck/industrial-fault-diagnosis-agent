@@ -1,6 +1,4 @@
-"""
-Day 20 - Stage 7
-FastAPI Business Entry - Fault Injection Ready
+"""Industrial RAG 的 FastAPI 业务入口。
 
 职责：
 - HTTP 请求接收；
@@ -64,13 +62,13 @@ from app.schemas import (
 # 1. Import Path Bootstrap
 # ============================================================
 #
-# 你当前 Day18/Day20 的 RAG 模块中仍有：
+# 部分 RAG 模块仍使用相对于 rag/ 目录的模块导入：
 #     from prompt_builder import ...
 #     from config import ...
 # 这类直接按 rag/ 目录导入的写法。
 #
 # 因此 FastAPI 启动时把 rag/ 加入 sys.path，
-# 保持与已经验收通过的脚本运行方式兼容。
+# 因此启动时将 rag/ 加入 sys.path，保持模块导入稳定。
 # ============================================================
 
 if str(RAG_DIR) not in sys.path:
@@ -129,7 +127,7 @@ app = FastAPI(
     title=APP_NAME,
     version=APP_VERSION,
     description=(
-        "Day20 工业设备故障诊断 RAG V1："
+        "工业设备故障诊断 RAG："
         "Document Upload -> Knowledge Base Build -> Retrieval -> QA"
     ),
 )

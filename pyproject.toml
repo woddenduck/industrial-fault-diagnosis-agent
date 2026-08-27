@@ -1,7 +1,7 @@
 [project]
 name = "industrial-fault-diagnosis-agent"
-version = "1.0.0"
-description = "基于 LangGraph、Hybrid RAG 和 Tool Calling 的工业设备故障诊断 Agent"
+version = "1.0.1"
+description = "基于 LangGraph、Hybrid RAG 和可审计工具节点的工业设备故障诊断 Agent"
 readme = "README.md"
 requires-python = ">=3.10,<3.12"
 authors = [
